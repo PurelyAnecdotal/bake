@@ -29,7 +29,10 @@ COPY . .
 RUN bun --bun run build
 
 # Expose the port that the app will run on
-EXPOSE 4173
+ENV PORT=8080
+EXPOSE 8080
+
+WORKDIR /app/build
 
 # Set the command to run the app
-CMD ["bun", "--bun", "run", "preview", "--host"]
+CMD ["bun", "--bun", "run", "start"]

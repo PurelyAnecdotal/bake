@@ -1,16 +1,19 @@
 <script lang="ts">
-    import CodeMirror from 'svelte-codemirror-editor';
-    import { java } from '@codemirror/lang-java';
-    import { Button } from 'flowbite-svelte';
+    import CodeMirror from "svelte-codemirror-editor";
+    import { java } from "@codemirror/lang-java";
+    import { Button } from "flowbite-svelte";
 
-    let value = '';
+    let value = "";
 
-    let output = '';
+    let output = "";
 
     async function runCode() {
-        const response = await fetch('/execute', {
-            method: 'POST',
-            body: value
+        const response = await fetch("/execute", {
+            method: "POST",
+            body: value,
+            headers: {
+                "Content-Type": "text/x-java",
+            },
         });
 
         output = await response.text();
