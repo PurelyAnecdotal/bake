@@ -34,5 +34,7 @@ EXPOSE 8080
 
 WORKDIR /app/build
 
+RUN mkdir /temp && chmod 755 /temp
+
 # Set the command to run the app
 CMD ["bun", "--bun", "run", "start"]

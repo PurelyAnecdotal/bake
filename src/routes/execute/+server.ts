@@ -3,7 +3,7 @@ export async function POST({ request }) {
 
     console.log(code);
 
-    await Bun.write("temp/Main.java", code);
+    await Bun.write("/temp/Main.java", code);
 
     console.log("Running");
 
@@ -12,7 +12,7 @@ export async function POST({ request }) {
         "-",
         "unprivileged",
         "-c",
-        "bwrap --ro-bind / / --unshare-all java temp/Main.java",
+        "bwrap --ro-bind / / --unshare-all java /temp/Main.java",
     ]);
     if (runProcess.exitCode !== 0) {
         console.error(`Execution Error: ${runProcess.stderr.toString()}`);
