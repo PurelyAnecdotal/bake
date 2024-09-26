@@ -9,7 +9,8 @@ export async function POST({ request }) {
 
     const runProcess = Bun.spawnSync([
         "su",
-        "-",
+        "-s",
+        "/bin/bash",
         "unprivileged",
         "-c",
         "bwrap --ro-bind / / --unshare-all java /temp/Main.java",
