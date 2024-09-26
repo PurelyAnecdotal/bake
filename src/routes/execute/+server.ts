@@ -8,12 +8,13 @@ export async function POST({ request }) {
     console.log("Running");
 
     const runProcess = Bun.spawnSync([
-        "su",
-        "-s",
-        "/bin/bash",
-        "unprivileged",
-        "-c",
-        "bwrap --ro-bind / / --unshare-all java /temp/Main.java",
+        "bwrap",
+        "--ro-bind",
+        "/",
+        "/",
+        "--unshare-all",
+        "java",
+        "/temp/Main.java",
     ]);
     if (runProcess.exitCode !== 0) {
         console.error(`Execution Error: ${runProcess.stderr.toString()}`);

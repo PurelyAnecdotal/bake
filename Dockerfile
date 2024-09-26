@@ -7,8 +7,6 @@ RUN dnf update -y && \
     dnf install -y bubblewrap unzip util-linux shadow-utils && \ 
     dnf clean all
 
-RUN useradd unprivileged
-
 # Install bun
 RUN curl -fsSL https://bun.sh/install | bash
 
