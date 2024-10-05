@@ -84,7 +84,8 @@
     let fitAddon: FitAddon;
 
     function onCodeMirrorReady(event: CustomEvent<EditorView>) {
-        fitAddon.fit();
+        if (!fitAddon) return;
+
         fitAddon.fit();
     }
 
