@@ -11,7 +11,6 @@
 
     import { java } from '@codemirror/lang-java';
     import { oneDark } from '@codemirror/theme-one-dark';
-    import { EditorView } from '@codemirror/view';
     import CodeMirror from 'svelte-codemirror-editor';
 
     import {
@@ -40,6 +39,7 @@
 
     type Version = {
         name: string;
+        time: Date;
         successful: boolean;
         code: string;
         output: string;
@@ -47,6 +47,11 @@
     let versions: Version[] = [];
 
     let currentVersion: Version;
+
+    const formatter = new Intl.DateTimeFormat('en', {
+        dateStyle: 'short',
+        timeStyle: 'short'
+    });
 
     async function runCode() {
         localStorage.setItem('code', value);
@@ -71,6 +76,7 @@
         versions = [
             {
                 name: `Version ${versions.length + 1}`,
+                time: new Date(),
                 successful: response.ok,
                 code: value,
                 output
@@ -81,23 +87,11 @@
         currentVersion = versions[0];
     }
 
-    let fitAddon: FitAddon;
+    let fitAddon: FitAddon | undefined = undefined;
 
-    function onCodeMirrorReady(event: CustomEvent<EditorView>) {
-        if (!fitAddon) return;
-
-        fitAddon.fit();
-    }
-
-    async function onXtermLoad(event: CustomEvent<{ terminal: Terminal }>) {
-        console.log('Child component has loaded');
-        terminal = event.detail.terminal;
-
-        // FitAddon Usage
-        fitAddon = new (await XtermAddon.FitAddon()).FitAddon();
-        terminal.loadAddon(fitAddon);
-        fitAddon.fit();
-    }
+    XtermAddon.FitAddon().then(({ FitAddon }) => {
+        fitAddon = new FitAddon();
+    });
 </script>
 
 <div class="flex h-full p-4 gap-4 min-h-screen max-h-screen">
@@ -106,14 +100,24 @@
             bind:value
             lang={java()}
             theme={oneDark}
-            on:ready={onCodeMirrorReady}
-            on:change={() => fitAddon.fit()}
+            on:ready={() => fitAddon?.fit()}
+            on:change={() => fitAddon?.fit()}
             class="overflow-y-auto"
         />
         <div
             class="p-4 rounded bg-black flex-auto shrink min-h-64 overflow-hidden"
         >
-            <Xterm {options} on:load={onXtermLoad} class="h-full" />
+            <Xterm
+                {options}
+                on:load={async (event) => {
+                    terminal = event.detail.terminal;
+
+                    if (!fitAddon) return;
+                    terminal.loadAddon(fitAddon);
+                    fitAddon.fit();
+                }}
+                class="h-full"
+            />
         </div>
     </div>
     <div>
@@ -134,10 +138,13 @@
                     class="flex justify-between items-center"
                     current={version === currentVersion}
                 >
-                    <span>{version.name}</span>
+                    <span>{formatter.format(version.time)}</span>
                     <Indicator color={version.successful ? 'green' : 'red'} />
                 </ListgroupItem>
             {/each}
+            {#if versions.length === 0}
+                <ListgroupItem active={false}>No versions</ListgroupItem>
+            {/if}
         </Listgroup>
     </div>
 </div>
